@@ -66,6 +66,11 @@ class Handler(Utils):
         self.window_main.show_all()
         self.restore()
 
+        # --> Grade
+        self.grade = builder.get_object("grade")
+        self.lst_grade = builder.get_object("lst_grade_main_window")
+        self.render_word = builder.get_object("render_word")
+
         # --> Variáveis globais para uso em múltiplas funções
         self.cod_selecteds = []
 
@@ -192,6 +197,9 @@ class Handler(Utils):
 
     def edit_word(self, *args):
         linha = args[1]
+        edicao = args[2]
+        self.grade.get_model()[linha][1] = edicao
+
 
     ###############################################################
     # --> Botões da janela Adicionar palavras
