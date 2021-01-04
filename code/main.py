@@ -36,7 +36,7 @@ class Utils:
         window.hide()
 
 
-ui_path = "/home/marcos/Python/outros/gtk/code/programa.glade"
+ui_path = "../code/programa.glade"
 builder = gtk.Builder.new_from_file(ui_path)
 
 
@@ -49,7 +49,7 @@ class Handler(Utils):
         super().__init__()
 
         # --> Conexão ao banco de dados sql
-        self.dados = sql.connect("/home/marcos/Python/outros/gtk/data/data.sqlite")
+        self.dados = sql.connect("../data/data.sqlite")
         self.cursor = self.dados.cursor()
 
         # --> Janela principal
@@ -192,7 +192,6 @@ class Handler(Utils):
 
     def edit_word(self, *args):
         linha = args[1]
-        
 
     ###############################################################
     # --> Botões da janela Adicionar palavras
