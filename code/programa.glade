@@ -200,6 +200,7 @@
                     <child>
                       <object class="GtkCellRendererText" id="render_phrase">
                         <property name="editable">True</property>
+                        <signal name="edited" handler="edit_phrase" swapped="no"/>
                       </object>
                       <attributes>
                         <attribute name="text">2</attribute>
@@ -214,6 +215,7 @@
                     <child>
                       <object class="GtkCellRendererText" id="render_meanings">
                         <property name="editable">True</property>
+                        <signal name="edited" handler="edit_meanings" swapped="no"/>
                       </object>
                       <attributes>
                         <attribute name="text">3</attribute>

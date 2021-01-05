@@ -188,18 +188,67 @@ class Handler(Utils):
         """
         try:
             for key in self.cod_selecteds:
-                self.cursor.execute(f"DELETE FROM vocabulary WHERE cod = {key}")
+                query = f"DELETE FROM vocabulary WHERE cod = {key}"
+                self.cursor.execute(query)
                 self.dados.commit()
                 self.restore()
         except Exception as ex:
-            self.dialog_box(self.window_dialog, self.label_dialog_primary, self.label_dialog_secondary,
-                            "Erro!", f"Ocorreu um erro: {ex}")
+            self.dialog_box(self.window_dialog, self.label_dialog_primary,
+                            self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
 
     def edit_word(self, *args):
-        linha = args[1]
-        edicao = args[2]
-        self.grade.get_model()[linha][1] = edicao
+        """
+        Função que permite a edição na coluna Palavra na tabela
+        Sinais conectados:
+        render_word = edited
+        """
+        try:
+            linha = args[1]
+            edicao = str(args[2])
+            key = int(self.grade.get_model()[linha][5])
+            query = f"UPDATE vocabulary SET word = '{edicao}' WHERE cod = {key}"
+            self.cursor.execute(query)
+            self.dados.commit()
+            self.grade.get_model()[linha][1] = edicao
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary,
+                            self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
 
+    def edit_phrase(self, *args):
+        """
+        Função que permite a edição na coluna Frase na tabela
+        Sinais conectados:
+        render_phrase = edited
+        """
+        try:
+            linha = args[1]
+            edicao = str(args[2])
+            key = int(self.grade.get_model()[linha][5])
+            query = f"UPDATE vocabulary SET phrase = '{edicao}' WHERE cod = {key}"
+            self.cursor.execute(query)
+            self.dados.commit()
+            self.grade.get_model()[linha][2] = edicao
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary,
+                            self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
+
+    def edit_meanings(self, *args):
+        """
+        Função que permite a edição na coluna Significados na tabela
+        Sinais conectados:
+        render_meanings = edited
+        """
+        try:
+            linha = args[1]
+            edicao = str(args[2])
+            key = int(self.grade.get_model()[linha][5])
+            query = f"UPDATE vocabulary SET meaning = '{edicao}' WHERE cod = {key}"
+            self.cursor.execute(query)
+            self.dados.commit()
+            self.grade.get_model()[linha][3] = edicao
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary,
+                            self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
 
     ###############################################################
     # --> Botões da janela Adicionar palavras
@@ -217,8 +266,8 @@ class Handler(Utils):
             meaning = self.entry_add_meaning.get_text()
             data_hoje = datetime.date.today()
             valores = [palavra, frase, meaning, data_hoje]
-            self.cursor.execute("INSERT INTO vocabulary(word, phrase, meaning, data) values(?, ?, ?, ?)",
-                                valores)
+            self.cursor.execute("INSERT INTO vocabulary(word, phrase, meaning, data) "
+                                "values(?, ?, ?, ?)", valores)
             self.dados.commit()
             self.entry_add_word.set_text("")
             self.entry_add_meaning.set_text("")
