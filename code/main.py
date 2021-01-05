@@ -60,7 +60,6 @@ class Handler(Utils):
         self.bt_restore = builder.get_object("bt_restore")
         self.bt_add = builder.get_object("bt_add")
         self.bt_remove = builder.get_object("bt_remove")
-        self.bt_edit = builder.get_object("bt_edit")
         self.grade = builder.get_object("grade")
         self.lst_grade = builder.get_object("lst_grade_main_window")
         self.window_main.show_all()
