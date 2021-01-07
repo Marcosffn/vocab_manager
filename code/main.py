@@ -35,8 +35,36 @@ class Utils:
         window.run()
         window.hide()
 
+    @staticmethod
+    def yes_no(bt_yes, bt_no):
+        if bt_yes.get_active():
+            return 1
+        elif bt_no.get_active():
+            return 0
 
-ui_path = "../code/programa.glade"
+    @staticmethod
+    def sim_nao(state):
+        if state == 1:
+            return "Sim"
+        else:
+            return "Não"
+
+    @staticmethod
+    def true_false(state):
+        if state == "Sim":
+            return 1
+        elif state == "sim":
+            return 1
+        elif state == "Não":
+            return 0
+        elif state == "não":
+            return 0
+        elif state == "nao":
+            return 0
+        elif state == "não":
+            return 0
+
+ui_path = "programa.glade"
 builder = gtk.Builder.new_from_file(ui_path)
 
 
@@ -49,7 +77,7 @@ class Handler(Utils):
         super().__init__()
 
         # --> Conexão ao banco de dados sql
-        self.dados = sql.connect("../data/data.sqlite")
+        self.dados = sql.connect("data.sqlite")
         self.cursor = self.dados.cursor()
 
         # --> Janela principal
@@ -84,6 +112,9 @@ class Handler(Utils):
         self.entry_add_phrase = builder.get_object("entry_phrase")
         self.entry_add_meaning = builder.get_object("entry_meaning")
         self.bt_gravar = builder.get_object("bt_gravar")
+        self.bt_yes = builder.get_object("bt_yes")
+        self.bt_no = builder.get_object("bt_no")
+        self.state_yes_no = 1
 
     #######################################################################
     # --> Botões da janela principal
@@ -121,7 +152,7 @@ class Handler(Utils):
         """
         try:
             self.lst_grade.clear()
-            self.cursor.execute("SELECT word, phrase, meaning, data, cod FROM vocabulary")
+            self.cursor.execute("SELECT word, phrase, meaning, data, cod, in_anki FROM vocabulary")
             results = self.cursor.fetchall()
             for item in results:
                 selecao = False
@@ -130,7 +161,8 @@ class Handler(Utils):
                 meaning = item[2]
                 date = item[3]
                 cod = str(item[4])
-                pesquisa = [selecao, word, phrase, meaning, date, cod]
+                in_anki = self.sim_nao(item[5])
+                pesquisa = [selecao, word, phrase, meaning, date, cod, in_anki]
                 self.lst_grade.append(pesquisa)
             self.entry_searchbar.set_text("")
         except Exception as ex:
@@ -249,6 +281,19 @@ class Handler(Utils):
             self.dialog_box(self.window_dialog, self.label_dialog_primary,
                             self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
 
+    def edit_in_anki(self, *args):
+        try:
+            linha = args[1]
+            value = self.true_false(args[2])
+            key = int(self.grade.get_model()[linha][5])
+            query = f"UPDATE vocabulary SET in_anki = {value} WHERE cod = {key}"
+            self.cursor.execute(query)
+            self.dados.commit()
+            self.grade.get_model()[linha][6] = args[2]
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary,
+                            self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
+
     ###############################################################
     # --> Botões da janela Adicionar palavras
 
@@ -264,9 +309,10 @@ class Handler(Utils):
             frase = self.entry_add_phrase.get_text()
             meaning = self.entry_add_meaning.get_text()
             data_hoje = datetime.date.today()
-            valores = [palavra, frase, meaning, data_hoje]
-            self.cursor.execute("INSERT INTO vocabulary(word, phrase, meaning, data) "
-                                "values(?, ?, ?, ?)", valores)
+            in_anki = self.state_yes_no
+            valores = [palavra, frase, meaning, data_hoje, in_anki]
+            self.cursor.execute("INSERT INTO vocabulary(word, phrase, meaning, data, in_anki) "
+                                "values(?, ?, ?, ?, ?)", valores)
             self.dados.commit()
             self.entry_add_word.set_text("")
             self.entry_add_meaning.set_text("")
@@ -280,6 +326,31 @@ class Handler(Utils):
             self.dialog_box(self.window_dialog, self.label_dialog_primary, self.label_dialog_secondary,
                             "Erro!", f"Ocorreu um erro ao gravar os dados: {ex}")
 
+    def tg_bt_yes(self, *args):
+        """
+        Função que é disparada ao selecionar a opção Sim na janela Adicionar palavras
+        Ela muda a variável global state_yes_no para 1 (True)
+        Sinais conectados:
+        bt_yes: toggled
+        """
+        try:
+            self.state_yes_no = self.yes_no(self.bt_yes, self.bt_no)
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary, self.label_dialog_secondary,
+                            "Erro!", f"Ocorreu um erro: {ex}")
+
+    def tg_bt_no(self, *args):
+        """
+        Função que é disparada ao selecionar a opção Não na janela Adicionar palavras
+        Ela muda a variável global state_yes_no para 0 (False)
+        Sinais conectados:
+        bt_no: toggled
+        """
+        try:
+            self.state_yes_no = self.yes_no(self.bt_yes, self.bt_no)
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary, self.label_dialog_secondary,
+                            "Erro!", f"Ocorreu um erro: {ex}")
     #############################################################
     # --> Funções para fechar janelas
 

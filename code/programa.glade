@@ -17,6 +17,8 @@
       <column type="gchararray"/>
       <!-- column-name cod -->
       <column type="gchararray"/>
+      <!-- column-name no_anki -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window_main">
@@ -228,6 +230,20 @@
                     </child>
                   </object>
                 </child>
+                <child>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">No Anki</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="render_no_anki">
+                        <property name="editable">True</property>
+                        <signal name="edited" handler="edit_in_anki" swapped="no"/>
+                      </object>
+                      <attributes>
+                        <attribute name="text">6</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
@@ -341,6 +357,7 @@
   </object>
   <object class="GtkWindow" id="window_addwords">
     <property name="can_focus">False</property>
+    <property name="valign">center</property>
     <property name="title" translatable="yes">Adicionar</property>
     <property name="modal">True</property>
     <property name="default_width">440</property>
@@ -379,7 +396,7 @@
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="halign">baseline</property>
+            <property name="halign">center</property>
             <property name="margin_left">5</property>
             <property name="margin_right">5</property>
             <property name="margin_top">5</property>
@@ -390,7 +407,8 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">end</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
                 <property name="margin_left">5</property>
                 <property name="margin_right">5</property>
                 <property name="margin_top">5</property>
@@ -407,7 +425,8 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">end</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
                 <property name="margin_left">5</property>
                 <property name="margin_right">5</property>
                 <property name="margin_top">5</property>
@@ -424,7 +443,8 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">end</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
                 <property name="margin_left">5</property>
                 <property name="margin_right">5</property>
                 <property name="margin_top">5</property>
@@ -483,6 +503,73 @@
               <packing>
                 <property name="left_attach">1</property>
                 <property name="top_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+                <property name="margin_left">5</property>
+                <property name="margin_right">5</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
+                <property name="label" translatable="yes">No Anki:</property>
+                <property name="justify">center</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButtonBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">5</property>
+                <property name="margin_right">5</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
+                <property name="layout_style">start</property>
+                <child>
+                  <object class="GtkRadioButton" id="bt_yes">
+                    <property name="label" translatable="yes">Sim</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">bt_no</property>
+                    <signal name="toggled" handler="tg_bt_yes" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="bt_no">
+                    <property name="label" translatable="yes">Não</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">bt_yes</property>
+                    <signal name="toggled" handler="tg_bt_no" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">3</property>
               </packing>
             </child>
           </object>
