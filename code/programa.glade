@@ -26,6 +26,7 @@
     <property name="title" translatable="yes">Gerenciador de vocabulário</property>
     <property name="default_width">800</property>
     <property name="default_height">500</property>
+    <property name="icon">../../../../vocabulary_manager/Sem título.png</property>
     <signal name="destroy" handler="destroy_window_main" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
@@ -124,6 +125,20 @@
                 <property name="homogeneous">True</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkToolButton" id="bt_export">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Exportar</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-save-as</property>
+                <signal name="clicked" handler="clicar_bt_export" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -162,10 +177,12 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkTreeViewColumn">
+                  <object class="GtkTreeViewColumn" id="palavra">
                     <property name="resizable">True</property>
                     <property name="title" translatable="yes">Palavra</property>
                     <property name="expand">True</property>
+                    <property name="clickable">True</property>
+                    <signal name="clicked" handler="order" swapped="no"/>
                     <child>
                       <object class="GtkCellRendererText" id="render_word">
                         <property name="editable">True</property>
@@ -178,7 +195,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkTreeViewColumn">
+                  <object class="GtkTreeViewColumn" id="frase">
                     <property name="title" translatable="yes">Frase</property>
                     <property name="expand">True</property>
                     <child>
@@ -193,7 +210,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkTreeViewColumn">
+                  <object class="GtkTreeViewColumn" id="significado">
                     <property name="title" translatable="yes">Significados</property>
                     <property name="expand">True</property>
                     <child>
@@ -261,8 +278,10 @@
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="destroy_with_parent">True</property>
+    <property name="icon_name">error-app</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
     <property name="urgency_hint">True</property>
     <signal name="delete-event" handler="close_popup" swapped="no"/>
     <child type="titlebar">
@@ -363,6 +382,7 @@
     <property name="default_width">440</property>
     <property name="default_height">250</property>
     <property name="destroy_with_parent">True</property>
+    <property name="icon_name">add</property>
     <signal name="delete-event" handler="close_window_addwords" swapped="no"/>
     <child type="titlebar">
       <placeholder/>

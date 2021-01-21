@@ -64,6 +64,7 @@ class Utils:
         elif state == "não":
             return 0
 
+
 ui_path = "programa.glade"
 builder = gtk.Builder.new_from_file(ui_path)
 
@@ -97,6 +98,10 @@ class Handler(Utils):
         self.grade = builder.get_object("grade")
         self.lst_grade = builder.get_object("lst_grade_main_window")
         self.render_word = builder.get_object("render_word")
+        self.palavra = builder.get_object("palavra")
+        self.frase = builder.get_object("frase")
+        self.significado = builder.get_object("significado")
+        self.order_controller = 0
 
         # --> Variáveis globais para uso em múltiplas funções
         self.cod_selecteds = []
@@ -128,7 +133,7 @@ class Handler(Utils):
         try:
             self.lst_grade.clear()
             pesquisa = str(self.entry_searchbar.get_text().upper())
-            self.cursor.execute(f"SELECT word, phrase, meaning, data, cod "
+            self.cursor.execute(f"SELECT word, phrase, meaning, data, cod, in_anki "
                                 f"FROM vocabulary WHERE word LIKE '%{pesquisa}%'")
             results = self.cursor.fetchall()
             for result in results:
@@ -138,7 +143,8 @@ class Handler(Utils):
                 meaning = result[2]
                 date = result[3]
                 cod = str(result[4])
-                pesquisa = [selecao, word, phrase, meaning, date, cod]
+                in_anki = self.sim_nao(result[5])
+                pesquisa = [selecao, word, phrase, meaning, date, cod, in_anki]
                 self.lst_grade.append(pesquisa)
         except Exception as ex:
             self.dialog_box(self.window_dialog, self.label_dialog_primary, self.label_dialog_secondary,
@@ -210,6 +216,36 @@ class Handler(Utils):
         self.window_addwords.set_transient_for(self.window_main)
         self.window_addwords.show_all()
 
+    def clicar_bt_export(self, *args):
+        """
+        Função que vai abrir a janela para criar um arquivo e salvar as
+        frases em txt para o anki
+        """
+        try:
+            dialog = gtk.FileChooserDialog(title="Salvar como", parent=self.window_main,
+                                           action=gtk.FileChooserAction.SAVE)
+            dialog.add_button("Salvar", gtk.ResponseType.OK)
+            dialog.add_button("Cancelar", gtk.ResponseType.CANCEL)
+            response = dialog.run()
+            if response == gtk.ResponseType.OK:
+                with open(dialog.get_filename(), "w") as arq:
+                    try:
+                        for c in self.cod_selecteds:
+                            query = f"SELECT phrase, meaning FROM vocabulary WHERE cod IS {c}"
+                            self.cursor.execute(query)
+                            result = self.cursor.fetchall()
+                            arq.write(str(result[0][0]) + "\t" + str(result[0][1]) + "\n")
+                    except Exception as ex:
+                        self.dialog_box(self.window_dialog, self.label_dialog_primary,
+                                        self.label_dialog_secondary,
+                                        "Erro!", f"Ocorreu um erro: {ex}")
+                dialog.hide()
+            elif response == gtk.ResponseType.CANCEL:
+                dialog.hide()
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary,
+                            self.label_dialog_secondary,
+                            "Erro!", f"Ocorreu um erro: {ex}")
     def clicar_bt_remove(self, *args):
         """
         Função que remove todos os itens selecionados na grade ao clicar o botão Remover
@@ -282,6 +318,9 @@ class Handler(Utils):
                             self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
 
     def edit_in_anki(self, *args):
+        """
+        Edita a coluna No anki na grade da Janela Principal
+        """
         try:
             linha = args[1]
             value = self.true_false(args[2])
@@ -293,6 +332,48 @@ class Handler(Utils):
         except Exception as ex:
             self.dialog_box(self.window_dialog, self.label_dialog_primary,
                             self.label_dialog_secondary, "Erro!", f"Ocorreu um erro: {ex}")
+
+    def order(self, *args):
+        try:
+            if self.order_controller == 0:
+                self.order_controller = 1
+                self.restore()
+                word_line = []
+                for a in self.lst_grade:
+                    linha = a.path.get_indices()[0]
+                    word_line.append([a[1], linha])
+                word_line.sort()
+                new = []
+                for n in word_line:
+                    new.append(n[1])
+                self.lst_grade.reorder(new)
+            elif self.order_controller == 1:
+                self.order_controller = 2
+                self.restore()
+                word_line = []
+                for a in self.lst_grade:
+                    linha = a.path.get_indices()[0]
+                    word_line.append([a[1], linha])
+                word_line.sort(reverse=True)
+                new = []
+                for n in word_line:
+                    new.append(n[1])
+                self.lst_grade.reorder(new)
+            elif self.order_controller == 2:
+                self.order_controller = 0
+                self.restore()
+        except Exception as ex:
+            self.dialog_box(self.window_dialog, self.label_dialog_primary, self.label_dialog_secondary,
+                            "Erro", f"Erro ao restaurar tabela:\n{ex}")
+
+    ###############################################################
+    # --> Botões da janela Exportar
+
+    def clicar_bt_salvar(self, *args):
+        pass
+
+    def clicar_bt_cancelar(self, *args):
+        pass
 
     ###############################################################
     # --> Botões da janela Adicionar palavras
@@ -351,6 +432,7 @@ class Handler(Utils):
         except Exception as ex:
             self.dialog_box(self.window_dialog, self.label_dialog_primary, self.label_dialog_secondary,
                             "Erro!", f"Ocorreu um erro: {ex}")
+
     #############################################################
     # --> Funções para fechar janelas
 
